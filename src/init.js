@@ -1,8 +1,9 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
 import keyBy from 'lodash/keyBy.js';
-import renderError from './view.js';
 import i18n from 'i18next';
+import renderError from './view.js';
+import resources from './locale/index.js';
 
 const validate = (url, urlsList) => {
   try {
@@ -18,16 +19,23 @@ const validate = (url, urlsList) => {
   }
 };
 
-const app = (i18n) => {
+const app = (i18next) => {
   const state = {
     form: {
       process: 'fill',
-      valid: false,
+      valid: '',
       errors: {},
       url: '',
       feeds: [],
     },
   };
+
+  const i18nInstance = i18n.createInstance();
+  i18nInstance.init({
+    lng: 'ru',
+    debug: false,
+    resources,
+  });
 
   const elements = {
     form: document.querySelector('.rss-form'),
@@ -45,11 +53,11 @@ const app = (i18n) => {
     },
   });
 
-  const watchedState = onChange(state, (path) => {
-    console.log(path);
+  const watchedState = onChange(state, (path, value) => {
+    // console.log( value);
     switch (path) {
       case 'form.errors': {
-        renderError(elements, watchedState.form.errors);
+        renderError(elements, watchedState, value, i18next);
         break;
       }
       default:
@@ -63,18 +71,18 @@ const app = (i18n) => {
     const urls = formData.get('url');
 
     validate(urls, watchedState.form.feeds).then((url) => {
-      watchedState.form.errors = 'RSS успешно загружен';
       watchedState.form.valid = true;
+      watchedState.form.errors = {};
       watchedState.form.feeds = [...watchedState.form.feeds, url];
-      console.log(watchedState.form.feeds);
 
       elements.form.reset();
     })
       .catch((err) => {
-        console.log(err.message.key)
-        const errors = err.message.key;
-        watchedState.form.errors = errors;
         watchedState.form.valid = false;
+        const error = err.message.key;
+
+        watchedState.form.errors = error;
+        // console.log(watchedState.form.errors)
       });
   });
 };

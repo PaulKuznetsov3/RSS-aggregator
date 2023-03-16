@@ -1,6 +1,7 @@
 const renderError = (elements, state, value, i18next) => {
   const { feedback } = elements;
   if (state.form.valid === false) {
+    console.log(value);
     feedback.textContent = i18next.t(value);
     elements.feedback.classList.add('text-danger');
     elements.feedback.classList.remove('text-success');

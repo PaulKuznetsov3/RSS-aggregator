@@ -87,7 +87,7 @@ const app = (i18next) => {
         watchedState.form.feeds = [...watchedState.form.feeds, url];
         watchedState.form.process = 'send';
         elements.form.reset();
-        return getResponse('https://ru.hexlet.io/lessons.rss');
+        return getResponse(input);
       })
       .then((response) => {
         console.log(response);

@@ -7,5 +7,7 @@ export default {
     networkError: 'Ошибка сети',
     unknown: 'Что-то пошло не так',
     success: 'Rss успешно добавлен',
+    feeds: 'Фиды',
+    posts: 'Посты',
   },
 };

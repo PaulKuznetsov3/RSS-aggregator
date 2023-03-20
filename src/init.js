@@ -3,10 +3,10 @@ import onChange from 'on-change';
 import keyBy from 'lodash/keyBy.js';
 import i18n from 'i18next';
 import axios from 'axios';
+import { uniqueId } from 'lodash';
 import render from './view.js';
 import resources from './locale/index.js';
 import parse from './parser.js';
-import { uniqueId } from 'lodash';
 
 const validate = (url, urlsList) => {
   try {
@@ -31,27 +31,23 @@ const getResponse = (url) => {
 };
 
 const update = (watchedState) => {
-   
-  console.log('feedLink', watchedState)
-  const promise = watchedState.form.feeds.map((feed) => {
-    getResponse(feed.link).then((response) => {
-      const data = parse(response.data.contents);
-      const { posts } = data;
-      posts.map((post) => {
-        post.id = uniqueId();
-        post.feedId = feed.id;
-      });
-      const postsID = watchedState.form.posts.map((post) => post.id)
-      console.log('postID', postsID)
-      const addPosts = posts.filter((post) => !postsID.includes(post.id))
-      console.log('addPost', addPosts)
-      watchedState.form.posts.unshift(...addPosts);
-      return addPosts;
-    })
-  })
- return Promise.all(promise).then(() => setTimeout(update, 5000, watchedState));
-}
-
+  console.log('feedLink', watchedState);
+  const promise = watchedState.form.feeds.map((feed) => getResponse(feed.link).then((response) => {
+    const data = parse(response.data.contents);
+    const { posts } = data;
+    const postsLinks = watchedState.form.posts.map((post) => post.postLink);
+    const addPosts = posts.filter((post) => !postsLinks.includes(post.postLink));
+    addPosts.map((item) => {
+      const post = item;
+      post.id = uniqueId();
+      post.feedId = feed.id;
+      return post;
+    });
+    watchedState.form.posts.unshift(...addPosts);
+    return addPosts;
+  }));
+  return Promise.all(promise).then(() => setTimeout(update, 5000, watchedState));
+};
 
 const app = (i18next) => {
   const state = {
@@ -62,7 +58,10 @@ const app = (i18next) => {
       urls: [],
       feeds: [],
       posts: [],
-
+    },
+    uiState: {
+      readPost: '',
+      displayedIDs: new Set(),
     },
   };
 
@@ -80,6 +79,9 @@ const app = (i18next) => {
     feedback: document.querySelector('.feedback'),
     posts: document.querySelector('.posts'),
     feeds: document.querySelector('.feeds'),
+    modalHeader: document.querySelector('.modal-header'),
+    modalBody: document.querySelector('.modal-body'),
+    modalButton: document.querySelector('.btn'),
   };
 
   yup.setLocale({
@@ -91,7 +93,7 @@ const app = (i18next) => {
     },
   });
 
-  const watchedState = onChange(state, render(state, elements, i18next))
+  const watchedState = onChange(state, render(state, elements, i18next));
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -108,21 +110,22 @@ const app = (i18next) => {
         return getResponse(input);
       })
       .then((response) => {
-        //console.log(response);
+        // console.log(response);
         const data = parse(response.data.contents);
         const { feed, posts } = data;
         const feedId = uniqueId();
         feed.id = feedId;
         feed.link = input;
-        posts.map((post) => {
+        posts.map((item) => {
+          const post = item;
           post.id = uniqueId();
           post.feedId = feedId;
+          return post;
         });
         watchedState.form.feeds.push(feed);
         watchedState.form.posts.push(...posts);
         console.log('post', state.form.posts);
-        //console.log('feed', state.form.feeds)
-        
+        // console.log('feed', state.form.feeds)
       })
       .catch((err) => {
         console.log(err);
@@ -144,7 +147,13 @@ const app = (i18next) => {
         }
       });
   });
-  update(watchedState)
+
+  elements.posts.addEventListener('click', (e) => {
+    const readPost = watchedState.form.posts.find((post) => post.id === e.target.dataset.id);
+    watchedState.uiState.readPost = readPost;
+    watchedState.uiState.displayedIDs.add(readPost.id);
+  });
+  update(watchedState);
 };
 
 export default app;

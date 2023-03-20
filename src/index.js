@@ -1,6 +1,7 @@
 import i18next from 'i18next';
 import app from './init.js';
 import './style.scss';
+import 'bootstrap';
 import resources from './locale/index.js';
 
 const runApp = () => {

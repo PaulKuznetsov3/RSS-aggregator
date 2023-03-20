@@ -1,7 +1,7 @@
 const renderError = (elements, state, value, i18next) => {
   const { feedback } = elements;
   if (state.form.valid === false) {
-   // console.log(value);
+    // console.log(value);
     feedback.textContent = i18next.t(value);
     elements.feedback.classList.add('text-danger');
     elements.feedback.classList.remove('text-success');
@@ -17,9 +17,6 @@ const renderError = (elements, state, value, i18next) => {
   }
 };
 
-// const creatCard = (elements, state, value, i18next) => {
-  
-// }
 
 const renderFeed = (elements, state, value, i18next) => {
   const { feeds } = elements;
@@ -33,7 +30,7 @@ const renderFeed = (elements, state, value, i18next) => {
 
   const cardTitle = document.createElement('h2');
   cardTitle.classList.add('card-title', 'h4');
-  cardTitle.textContent = i18next.t(`feeds`);
+  cardTitle.textContent = i18next.t('feeds');
 
   cardBody.append(cardTitle);
   card.append(cardBody);
@@ -42,30 +39,28 @@ const renderFeed = (elements, state, value, i18next) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
   value.map((feed) => {
-    //console.log( feed.chennelTitle)
+    // console.log( feed.chennelTitle)
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'border-0', 'border-end-0');
-   
+
     const feedTitle = document.createElement('h3');
     feedTitle.classList.add('h6', 'm-0');
     feedTitle.textContent = feed.chennelTitle;
-    
-    
 
     const p = document.createElement('p');
     p.classList.add('m-0', 'small', 'text-black-50');
     p.textContent = feed.chennelDescr;
-   
+
     li.append(feedTitle);
 
     li.append(p);
 
-    ul.append(li)
-  })
-  
-  card.append(ul)
-  feeds.append(card)
-}
+    return ul.prepend(li);
+  });
+
+  card.append(ul);
+  feeds.append(card);
+};
 
 const createButton = (post) => {
   const button = document.createElement('button');
@@ -76,7 +71,7 @@ const createButton = (post) => {
   button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
   button.textContent = 'Просмотр';
   return button;
-}
+};
 
 const renderPosts = (elements, state, value, i18next) => {
   const { posts } = elements;
@@ -90,7 +85,7 @@ const renderPosts = (elements, state, value, i18next) => {
 
   const cardTitle = document.createElement('h2');
   cardTitle.classList.add('card-title', 'h4');
-  cardTitle.textContent = i18next.t(`posts`);
+  cardTitle.textContent = i18next.t('posts');
 
   cardBody.append(cardTitle);
   card.append(cardBody);
@@ -99,7 +94,7 @@ const renderPosts = (elements, state, value, i18next) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
   value.map((post) => {
-    //console.log('post', post)
+    // console.log('post', post)
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
@@ -108,19 +103,36 @@ const renderPosts = (elements, state, value, i18next) => {
     a.setAttribute('data-id', post.id);
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
-    a.classList.add('fw-bold');
+    if (state.uiState.displayedIDs.has(post.id)) {
+      a.classList.add('fw-normal');
+    } else {
+      a.classList.add('fw-bold');
+    }
+
     a.textContent = post.postTitle;
 
-    li.append(a)
+    li.append(a);
 
     const button = createButton(post);
 
     li.append(button);
 
-    ul.append(li)
-  })
-  card.append(ul)
-  posts.append(card)
+    return ul.prepend(li);
+  });
+  card.append(ul);
+  posts.append(card);
+};
+
+const renderModal = (elements, state, value) => {
+  const { modalHeader } = elements;
+  console.log(value.postTitle);
+  modalHeader.textContent = value.postTitle;
+  const { modalBody } = elements;
+  modalBody.textContent = value.postDescr;
+  elements.modalButton.setAttribute('href', value.postLink);
+  const a = document.querySelector(`[data-id='${value.id}']`);
+  a.classList.remove('fw-bold');
+  a.classList.add('fw-normal');
 };
 
 const render = (state, elements, i18next) => (path, value) => {
@@ -128,18 +140,21 @@ const render = (state, elements, i18next) => (path, value) => {
     case 'form.errors': {
       renderError(elements, state, value, i18next);
       break;
-    };
+    }
     case 'form.feeds': {
       renderFeed(elements, state, value, i18next);
       break;
-    };
+    }
     case 'form.posts': {
       renderPosts(elements, state, value, i18next);
       break;
-    };
+    }
+    case 'uiState.readPost': {
+      renderModal(elements, state, value, i18next);
+      break;
+    }
     default:
       break;
   }
-
-}
+};
 export default render;

@@ -3,4 +3,6 @@
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/ed4fcd7f9622be30f50a/maintainability)](https://codeclimate.com/github/PaulKuznetsov3/frontend-project-11/maintainability)
 
+[![Node CI](https://github.com/PaulKuznetsov3/frontend-project-11/actions/workflows/nodejs.yml/badge.svg)](https://github.com/PaulKuznetsov3/frontend-project-11/actions/workflows/nodejs.yml)
+
 https://frontend-project-11-x1wl.vercel.app/

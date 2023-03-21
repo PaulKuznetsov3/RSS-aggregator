@@ -17,7 +17,6 @@ const validate = (url, urlsList) => {
 
     return schema.validate(url, { abortEarly: false });
   } catch (e) {
-    console.log(e);
     return keyBy(e.inner, 'path');
   }
 };
@@ -31,7 +30,6 @@ const getResponse = (url) => {
 };
 
 const update = (watchedState) => {
-  console.log('feedLink', watchedState);
   const promise = watchedState.form.feeds.map((feed) => getResponse(feed.link).then((response) => {
     const data = parse(response.data.contents);
     const { posts } = data;
@@ -110,7 +108,6 @@ const app = (i18next) => {
         return getResponse(input);
       })
       .then((response) => {
-        // console.log(response);
         const data = parse(response.data.contents);
         const { feed, posts } = data;
         const feedId = uniqueId();
@@ -122,13 +119,11 @@ const app = (i18next) => {
           post.feedId = feedId;
           return post;
         });
+        watchedState.form.process = 'ok';
         watchedState.form.feeds.push(feed);
         watchedState.form.posts.push(...posts);
-        console.log('post', state.form.posts);
-        // console.log('feed', state.form.feeds)
       })
       .catch((err) => {
-        console.log(err);
         if (err.name === 'ValidationError') {
           watchedState.form.valid = false;
           const error = err.message.key;

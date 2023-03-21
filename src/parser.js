@@ -2,9 +2,6 @@ const parse = (data) => {
   const parser = new DOMParser();
   const xmlDocument = parser.parseFromString(data, 'text/xml');
   const parseError = xmlDocument.querySelector('parsererror');
-  console.log(xmlDocument);
-  console.log('err', parseError);
-
   if (parseError) {
     const error = new Error();
     error.name = 'parseError';

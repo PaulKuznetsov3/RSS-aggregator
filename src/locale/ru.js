@@ -6,8 +6,9 @@ export default {
     notRss: 'Ресурс не содержит валидный RSS',
     networkError: 'Ошибка сети',
     unknown: 'Что-то пошло не так',
-    success: 'Rss успешно добавлен',
+    success: 'RSS успешно загружен',
     feeds: 'Фиды',
     posts: 'Посты',
+    button: 'Просмотр',
   },
 };

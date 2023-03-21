@@ -1,7 +1,6 @@
 const renderError = (elements, state, value, i18next) => {
   const { feedback } = elements;
   if (state.form.valid === false) {
-    // console.log(value);
     feedback.textContent = i18next.t(value);
     elements.feedback.classList.add('text-danger');
     elements.feedback.classList.remove('text-success');
@@ -16,7 +15,6 @@ const renderError = (elements, state, value, i18next) => {
     elements.input.focus();
   }
 };
-
 
 const renderFeed = (elements, state, value, i18next) => {
   const { feeds } = elements;
@@ -39,7 +37,6 @@ const renderFeed = (elements, state, value, i18next) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
   value.map((feed) => {
-    // console.log( feed.chennelTitle)
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'border-0', 'border-end-0');
 
@@ -69,7 +66,6 @@ const createButton = (post) => {
   button.setAttribute('data-bs-toggle', 'modal');
   button.setAttribute('data-bs-target', '#modal');
   button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-  button.textContent = 'Просмотр';
   return button;
 };
 
@@ -94,7 +90,6 @@ const renderPosts = (elements, state, value, i18next) => {
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
   value.map((post) => {
-    // console.log('post', post)
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
@@ -108,15 +103,11 @@ const renderPosts = (elements, state, value, i18next) => {
     } else {
       a.classList.add('fw-bold');
     }
-
     a.textContent = post.postTitle;
-
     li.append(a);
-
     const button = createButton(post);
-
+    button.textContent = i18next.t('button');
     li.append(button);
-
     return ul.prepend(li);
   });
   card.append(ul);
@@ -125,7 +116,6 @@ const renderPosts = (elements, state, value, i18next) => {
 
 const renderModal = (elements, state, value) => {
   const { modalHeader } = elements;
-  console.log(value.postTitle);
   modalHeader.textContent = value.postTitle;
   const { modalBody } = elements;
   modalBody.textContent = value.postDescr;

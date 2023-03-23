@@ -2,15 +2,15 @@ const renderError = (elements, state, value, i18next) => {
   const { feedback } = elements;
   if (state.form.valid === false) {
     feedback.textContent = i18next.t(value);
-    elements.feedback.classList.add('text-danger');
-    elements.feedback.classList.remove('text-success');
+    feedback.classList.add('text-danger');
+    feedback.classList.remove('text-success');
     elements.input.classList.add('is-invalid');
     elements.input.focus();
   }
   if (state.form.valid === true) {
     feedback.textContent = i18next.t('success');
-    elements.feedback.classList.remove('text-danger');
-    elements.feedback.classList.add('text-success');
+    feedback.classList.remove('text-danger');
+    feedback.classList.add('text-success');
     elements.input.classList.remove('is-invalid');
     elements.input.focus();
   }
@@ -92,7 +92,6 @@ const renderPosts = (elements, state, value, i18next) => {
   value.map((post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-
     const a = document.createElement('a');
     a.setAttribute('href', post.postLink);
     a.setAttribute('data-id', post.id);
@@ -125,6 +124,16 @@ const renderModal = (elements, state, value) => {
   a.classList.add('fw-normal');
 };
 
+const renderButton = (elements, state) => {
+  console.log(state.form.process);
+  const { button } = elements;
+  if (state.form.process !== 'send') {
+    button.disabled = false;
+  }
+  if (state.form.process === 'send') {
+    button.disabled = true;
+  }
+};
 const render = (state, elements, i18next) => (path, value) => {
   switch (path) {
     case 'form.errors': {
@@ -141,6 +150,10 @@ const render = (state, elements, i18next) => (path, value) => {
     }
     case 'uiState.readPost': {
       renderModal(elements, state, value, i18next);
+      break;
+    }
+    case 'form.process': {
+      renderButton(elements, state);
       break;
     }
     default:

@@ -21,13 +21,15 @@ const validate = (url, urlsList) => {
   }
 };
 
-const getResponse = (url) => {
+const prepareUrl = (url) => {
   const allOrigins = 'https://allorigins.hexlet.app/get';
   const preparedURL = new URL(allOrigins);
   preparedURL.searchParams.set('disableCache', 'true');
   preparedURL.searchParams.set('url', url);
-  return axios.get(preparedURL);
+  return preparedURL;
 };
+
+const getResponse = (preparedURL) => axios.get(prepareUrl(preparedURL));
 
 const update = (watchedState) => {
   const promise = watchedState.form.feeds.map((feed) => getResponse(feed.link).then((response) => {
@@ -51,9 +53,8 @@ const app = (i18next) => {
   const state = {
     form: {
       process: 'fill',
-      valid: '',
+      valid: true,
       errors: {},
-      urls: [],
       feeds: [],
       posts: [],
     },
@@ -73,7 +74,7 @@ const app = (i18next) => {
   const elements = {
     form: document.querySelector('.rss-form'),
     input: document.querySelector('#url-input'),
-    button: document.querySelector('button'),
+    button: document.querySelector('.btn-lg'),
     feedback: document.querySelector('.feedback'),
     posts: document.querySelector('.posts'),
     feeds: document.querySelector('.feeds'),
@@ -97,17 +98,17 @@ const app = (i18next) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const input = formData.get('url');
-
-    validate(input, watchedState.form.urls)
-      .then((url) => {
+    const urls = state.form.feeds.map((feed) => feed.link);
+    validate(input, urls)
+      .then(() => {
         watchedState.form.valid = true;
         watchedState.form.errors = {};
-        watchedState.form.urls = [...watchedState.form.urls, url];
         watchedState.form.process = 'send';
         elements.form.reset();
         return getResponse(input);
       })
       .then((response) => {
+        watchedState.form.process = 'fill';
         const data = parse(response.data.contents);
         const { feed, posts } = data;
         const feedId = uniqueId();
@@ -119,7 +120,6 @@ const app = (i18next) => {
           post.feedId = feedId;
           return post;
         });
-        watchedState.form.process = 'ok';
         watchedState.form.feeds.push(feed);
         watchedState.form.posts.push(...posts);
       })
@@ -139,6 +139,7 @@ const app = (i18next) => {
           watchedState.form.valid = false;
           watchedState.form.errors = 'notRss';
           watchedState.form.process = 'error';
+          console.log(watchedState.form.process);
         }
       });
   });
